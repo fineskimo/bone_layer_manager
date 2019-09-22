@@ -7,9 +7,9 @@ bpy.types.PoseBone.constraint_active_index = bpy.props.IntProperty()
 
 con_icons = {con.identifier: con.icon for con in bpy.types.Constraint.bl_rna.properties['type'].enum_items}
 
-has_notarget = ['OBJECT_SOLVER', 'CAMERA_SOLVER', 'FOLLOW_TRACK', 'LIMIT_DISTANCE',
-                'LIMIT_LOCATION', 'LIMIT_ROTATION', 'LIMIT_SCALE', 'MAINTAIN_VOLUME',
-                'TRANSFORM_CACHE', 'ARMATURE'
+has_notarget = ['OBJECT_SOLVER', 'CAMERA_SOLVER', 'FOLLOW_TRACK',
+                'LIMIT_LOCATION', 'LIMIT_ROTATION', 'LIMIT_SCALE',
+                'MAINTAIN_VOLUME', 'TRANSFORM_CACHE', 'ARMATURE'
                 ]
 
 list_count = 0
