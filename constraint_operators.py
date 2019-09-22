@@ -64,8 +64,8 @@ class QC_OT_contraint_action(bpy.types.Operator):
             bone.constraints.remove(con)
             if idx > 0:
                 bone.constraint_active_index -= 1
-            # remove active index property if not in use
-            if con_count == 1:
+            # remove active index property if exists and not in use
+            if con_count == 1 and bone.constraint_active_index:
                 del bone["constraint_active_index"]
 
         # contraint specific operators
