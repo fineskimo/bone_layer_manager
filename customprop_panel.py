@@ -69,7 +69,7 @@ class BLM_PT_customproperties_layout(bpy.types.Panel):
                 b
                 for o in obs
                 for b in getattr(o.pose, 'bones', [])
-                if b.bone.select
+                if o.data.edit_bones[f'{b.name}'].select
             ]
 
         # Store the indexes of selected objects, as a dict()
