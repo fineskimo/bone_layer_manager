@@ -65,7 +65,7 @@ class QC_OT_contraint_action(bpy.types.Operator):
             if idx > 0:
                 bone.constraint_active_index -= 1
             # remove active index property if exists and not in use
-            if con_count == 1 and bone.constraint_active_index:
+            if con_count == 1 and bone.get('constraint_active_index') is not None:
                 del bone["constraint_active_index"]
 
         # contraint specific operators
@@ -113,11 +113,15 @@ class QC_OT_constraint_add(bpy.types.Operator):
         return context.object is not None
 
     def invoke(self, context, event):
+        bone = context.active_pose_bone
         bpy.ops.pose.constraint_add(type=self.ctype)
         # Redraw required to update QC_UL_conlist
         for region in context.area.regions:
                 if region.type == "UI":
                     region.tag_redraw()
+        # Add index if not present
+        if bone.get('constraint_active_index') is None:
+            bone.constraint_active_index = 0
 
         return {'FINISHED'}
 
