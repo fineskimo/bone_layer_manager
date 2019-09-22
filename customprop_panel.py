@@ -65,12 +65,20 @@ class BLM_PT_customproperties_layout(bpy.types.Panel):
                 *[o for o in context.selected_objects
                   if (o != obj and o.type == 'ARMATURE')],
             )
-            bones = [
-                b
-                for o in obs
-                for b in getattr(o.pose, 'bones', [])
-                if o.data.edit_bones[f'{b.name}'].select
-            ]
+            if context.mode == 'EDIT':
+                bones = [
+                    b
+                    for o in obs
+                    for b in getattr(o.pose, 'bones', [])
+                    if o.data.edit_bones[f'{b.name}'].select
+                ]
+            else:
+                bones = [
+                    b
+                    for o in obs
+                    for b in getattr(o.pose, 'bones', [])
+                    if b.bone.select
+                ]
 
         # Store the indexes of selected objects, as a dict()
         objs = {o: i for (i, o) in enumerate(context.selected_objects)}
