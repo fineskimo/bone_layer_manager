@@ -7,7 +7,27 @@ bpy.types.PoseBone.constraint_active_index = bpy.props.IntProperty()
 
 con_icons = {con.identifier: con.icon for con in bpy.types.Constraint.bl_rna.properties['type'].enum_items}
 
+has_notarget = ['OBJECT_SOLVER', 'CAMERA_SOLVER', 'FOLLOW_TRACK', 'LIMIT_DISTANCE',
+                'LIMIT_LOCATION', 'LIMIT_ROTATION', 'LIMIT_SCALE', 'MAINTAIN_VOLUME',
+                'TRANSFORM_CACHE', 'ARMATURE'
+                ]
+
 list_count = 0
+
+
+def constraint_alert(con):
+    # Constraint error check
+
+    if con.type not in has_notarget:
+        con_target = getattr(con, "target", None)
+
+        if not con_target:
+            return False
+
+        elif con_target.type == 'ARMATURE':
+            return con.subtarget != ""
+
+    return True
 
 
 class QC_MT_specials(bpy.types.Menu):
@@ -25,19 +45,15 @@ class QC_MT_specials(bpy.types.Menu):
         layout.operator("pose.constraints_clear", icon='PANEL_CLOSE', text="Clear all constraints")
 
 
-class QC_OT_popup(bpy.types.Operator):
-    # Ugly Add Constraint Popup (Required for UIList redraw/update)
-    bl_idname = "qconstraint.popup"
-    bl_label = ""
-
-    def execute(self, context):
-        return context.window_manager.invoke_popup(self, width=450)
+class QC_MT_popup(bpy.types.Menu):
+    # Add Constraint Menu (Required for UIList redraw/update)
+    bl_label = "Add Constraint"
 
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
+        row.alignment = 'LEFT'
         split = row.split(align=True, factor=0.25)
-        split.alignment = 'LEFT'
 
         args = dict(operator='qconstraint.constraint_add', emboss=False)
 
@@ -125,16 +141,21 @@ class QC_PT_subqcontraints(bpy.types.Panel):
                           bone, "constraint_active_index", rows=5,
                           sort_reverse=False)
 
-        # always draw as placemarker (disabled by polling)
         col = row.column(align=True)
-        col.operator("bone.constraint_action", icon='ADD', text="").action = 'ADD'
+        # draw menu or operator as placemarker (disabled by polling)
+        if context.selected_pose_bones:
+            sub = col.column(align=True)
+            sub.menu("QC_MT_popup", icon='ADD', text="")
+        else:
+            col.operator("bone.constraint_action", icon='ADD', text="").action = 'ADD'
+
         col.operator("bone.constraint_action", icon='REMOVE', text="").action = 'REMOVE'
         col.separator()
 
         # conditional draw
         if context.selected_pose_bones:
-            sub = col.column(align=True)
-            sub.menu("QC_MT_specials", icon='DOWNARROW_HLT', text="")
+            sub2 = col.column(align=True)
+            sub2.menu("QC_MT_specials", icon='DOWNARROW_HLT', text="")
             col.separator()
 
             if len(bone.constraints) > 1:
@@ -156,6 +177,9 @@ class QC_UL_conlist(bpy.types.UIList):
             list_count += 1
             row = layout.split(factor=0.8)
             row.prop(item, "name", text="", emboss=False, icon=con_icons[item.type])
+            row = layout.row(align=True)
+            icon = 'BLANK1' if constraint_alert(item) else 'ERROR'
+            row.label(text="", icon=icon)
             row = layout.row(align=True)
             icon = 'HIDE_ON' if item.mute else 'HIDE_OFF'
             row.prop(item, "mute", text="", icon=icon, emboss=False)
