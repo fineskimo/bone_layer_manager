@@ -206,7 +206,6 @@ class QC_OT_copyconstraint(bpy.types.Operator):
             for attr in dir(source_con):
                 if attr.find(string) != -1 and attr not in readonly_attr:
                     setattr(target, attr, getattr(source_con, attr))
-                    # print(f'{attr} Copied')
 
         return {'FINISHED'}
 
@@ -226,7 +225,6 @@ class QC_OT_copyall(bpy.types.Operator):
 
         source_bone = context.active_pose_bone
         idx = source_bone.constraint_active_index
-        source_con = source_bone.constraints[idx]
         selected = context.selected_pose_bones[:]
         selected.remove(source_bone)
 
