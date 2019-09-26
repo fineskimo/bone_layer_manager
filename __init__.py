@@ -16,11 +16,11 @@ from . create_layer_id import CREATEID_OT_name
 from . layer_audit import BLM_OT_layeraudit
 from . qconstraints_panel import (QC_MT_specials, QC_MT_popup, QC_UL_conlist,
                                   QC_PT_qcontraints, QC_PT_subqcontraints,
-                                  QC_PT_ConSettings,)
+                                  QC_PT_ConSettings)
 
 from . constraint_operators import (QC_OT_contraint_action, QC_OT_constraint_add,
                                     QC_OT_remove_target, QC_OT_disable_keep_transform,
-                                    QC_OT_copyconstraint, QC_OT_copyall)
+                                    QC_OT_copyconstraint, QC_OT_copyall, QC_OT_copyflipx)
 
 from os.path import basename, dirname
 from bpy.props import BoolProperty, EnumProperty, IntProperty, FloatProperty
@@ -208,7 +208,7 @@ classes = (
     QC_MT_specials,
     QC_OT_copyconstraint,
     QC_OT_copyall,
-
+    QC_OT_copyflipx,
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)

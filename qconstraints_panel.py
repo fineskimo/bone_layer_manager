@@ -32,13 +32,13 @@ def constraint_alert(con):
 
 class QC_MT_specials(bpy.types.Menu):
     # Constraints specials menu
-    bl_label = "Specials"
+    bl_label = "Quick Constraints"
 
     def draw(self, context):
         layout = self.layout
         layout.operator("qconstraint.copy", icon='DUPLICATE', text="Copy constraint to selected")
         # TODO
-        # layout.operator("qconstraint.copyflipped", icon='DUPLICATE', text="Copy constraint to selected (flipped)")
+        layout.operator("qconstraint.xflipcopy", icon='DUPLICATE', text="Copy constraint to selected (flipped)")
         layout.separator()
         layout.operator("qconstraint.copyall", icon='DUPLICATE', text="Copy all constraints to selected")
         layout.separator()
@@ -47,7 +47,8 @@ class QC_MT_specials(bpy.types.Menu):
 
 class QC_MT_popup(bpy.types.Menu):
     # Add Constraint Menu (Required for UIList redraw/update)
-    bl_label = "Add Constraint"
+    bl_idname = "QC_MT_popup"
+    bl_label = "Add Constraint (Add with target if multiple bones selected)"
 
     def draw(self, context):
         layout = self.layout

@@ -1,4 +1,5 @@
 import bpy
+import re
 
 from .blmfuncs import ShowMessageBox
 
@@ -6,6 +7,61 @@ bpy.types.PoseBone.constraint_active_index = bpy.props.IntProperty()
 
 readonly_attr = ['__doc__', '__module__', '__slots__', 'bl_rna', 'error_location',
                  'error_rotation', 'is_proxy_local', 'is_valid', 'rna_type', 'type']
+
+l_names = ['Left', 'left', 'LEFT', 'L', 'l']
+r_names = ['Right', 'right', 'RIGHT', 'R', 'r']
+
+
+def getmirror(side, oside, name):
+    # get mirror name from name
+    mir_name = name
+
+    for i, value in enumerate(side):
+        if value == name:
+            mir_name = oside[i]
+            break
+
+    return mir_name
+
+
+def xflip(xname):
+    # Flip names
+    arm = bpy.context.active_object
+    full_mir_prefix = base = full_mir_suffix = number = ""
+    l_joined = "|".join(l_names)
+    r_joined = "|".join(r_names)
+
+    find_l = r'^((' + l_joined + r')[._\- ])?(.*?)?([._\- ](' + l_joined + r'))?([._\- ]\d+)?$'
+    find_r = r'^((' + r_joined + r')[._\- ])?(.*?)?([._\- ](' + r_joined + r'))?([._\- ]\d+)?$'
+
+    l_match = re.match(find_l, xname)
+    r_match = re.match(find_r, xname)
+
+    match = l_match if True else r_match
+
+    if match:
+        full_prefix = match.group(1) if match.group(1) is not None else ""
+        prefix = match.group(2) if match.group(2) is not None else ""
+        base = match.group(3) if match.group(3) is not None else ""
+        full_suffix = match.group(4) if match.group(4) is not None else ""
+        suffix = match.group(5) if match.group(5) is not None else ""
+        number = match.group(6) if match.group(6) is not None else ""
+
+        if prefix is not None:
+            side = l_names if prefix in l_names else r_names
+            oside = l_names if prefix not in l_names else r_names
+            mir_prefix = getmirror(side, oside, prefix)
+            full_mir_prefix = re.sub(prefix, mir_prefix, full_prefix)
+
+        if suffix is not None:
+            side = l_names if suffix in l_names else r_names
+            oside = l_names if suffix not in l_names else r_names
+            mir_suffix = getmirror(side, oside, suffix)
+            full_mir_suffix = re.sub(suffix, mir_suffix, full_suffix)
+
+    mir_name = f'{full_mir_prefix}{base}{full_mir_suffix}{number}'
+    # if bone not found return original target
+    return mir_name if arm.pose.bones.get(mir_name) is not None else xname
 
 
 class QC_OT_contraint_action(bpy.types.Operator):
@@ -112,9 +168,12 @@ class QC_OT_constraint_add(bpy.types.Operator):
     def poll(cls, context):
         return context.object is not None
 
-    def invoke(self, context, event):
+    def execute(self, context):
         bone = context.active_pose_bone
-        bpy.ops.pose.constraint_add(type=self.ctype)
+        if len(context.selected_pose_bones) > 1:
+            bpy.ops.pose.constraint_add_with_targets(type=self.ctype)
+        else:
+            bpy.ops.pose.constraint_add(type=self.ctype)
         # Redraw required to update QC_UL_conlist
         for region in context.area.regions:
                 if region.type == "UI":
@@ -206,6 +265,45 @@ class QC_OT_copyconstraint(bpy.types.Operator):
             for attr in dir(source_con):
                 if attr.find(string) != -1 and attr not in readonly_attr:
                     setattr(target, attr, getattr(source_con, attr))
+
+        return {'FINISHED'}
+
+
+class QC_OT_copyflipx(bpy.types.Operator):
+    # Copy active constraint to selected bones (flip x subtarget name)
+    bl_idname = "qconstraint.xflipcopy"
+    bl_label = ""
+    bl_description = "Copy active constraint to selected bones (X axis flip)"
+
+    @classmethod
+    def poll(self, context):
+        bone = context.active_pose_bone
+        return len(bone.constraints) > 0 and len(context.selected_pose_bones) > 1
+
+    def execute(self, context):
+
+        source_bone = context.active_pose_bone
+        idx = source_bone.constraint_active_index
+        source_con = source_bone.constraints[idx]
+        selected = context.selected_pose_bones[:]
+        selected.remove(source_bone)
+        string = ""
+
+        for target_bone in selected:
+            target = target_bone.constraints.new(source_con.type)
+
+            # assign property if required
+            if len(target_bone.constraints) == 1:
+                target_bone.constraint_active_index = 0
+
+            for attr in dir(source_con):
+                if attr.find(string) != -1 and attr not in readonly_attr:
+                    if attr == "subtarget":
+                        xname = getattr(source_con, attr)
+                        setattr(target, attr, xflip(xname))
+                    else:
+                        setattr(target, attr, getattr(source_con, attr))
+                    # print(f'{attr} Copied')
 
         return {'FINISHED'}
 
