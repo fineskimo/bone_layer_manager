@@ -185,6 +185,33 @@ class QC_OT_constraint_add(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class QC_OT_constraint_clear(bpy.types.Operator):
+    # Clear all contraints
+    bl_idname = "qconstraint.constraint_clear"
+    bl_label = ""
+    bl_options = {'REGISTER', 'UNDO'}
+    bl_description = "Clear all constraints for the selected bones"
+
+    @classmethod
+    def poll(self, context):
+        bone = context.active_pose_bone
+        return len(bone.constraints) > 0 and len(context.selected_pose_bones) > 0
+
+    def execute(self, context):
+        bpy.ops.pose.constraints_clear('INVOKE_DEFAULT')
+        # Redraw required to update QC_UL_conlist
+        for region in context.area.regions:
+                if region.type == "UI":
+                    region.tag_redraw()
+
+        # remove index property from all bones
+        for bone in context.selected_pose_bones:
+            if bone.get('constraint_active_index') is not None:
+                del bone["constraint_active_index"]
+
+        return {'FINISHED'}
+
+
 class QC_OT_remove_target(bpy.types.Operator):
     # Remove the target from the constraint
     bl_idname = "qconstraint.remove_target"
