@@ -20,12 +20,15 @@ from . qconstraints_panel import (QC_MT_specials, QC_MT_popup, QC_UL_conlist,
 
 from . constraint_operators import (QC_OT_contraint_action, QC_OT_constraint_add,
                                     QC_OT_remove_target, QC_OT_disable_keep_transform,
-                                    QC_OT_copyconstraint, QC_OT_copyall, QC_OT_copyflipx)
+                                    QC_OT_copyconstraint, QC_OT_copyall, QC_OT_copyflipx,
+                                    QC_OT_constraint_clear)
 
 from os.path import basename, dirname
 from bpy.props import BoolProperty, EnumProperty, IntProperty, FloatProperty
+import rna_keymap_ui
 
 import bpy
+
 
 bl_info = {
     'name': 'Bone Layer Manager',
@@ -40,12 +43,15 @@ bl_info = {
     'category': '3D View'
 }
 
+addon_keymaps = []
+
 
 class BLMpreferences(bpy.types.AddonPreferences):
     bl_idname = __name__  # basename(dirname(__file__))
 
     def draw(self, context):
         layout = self.layout
+        addon_prefs = context.preferences.addons[__name__].preferences
         row = layout.row()
 
         col = row.column()
@@ -70,6 +76,15 @@ class BLMpreferences(bpy.types.AddonPreferences):
         col = row.column()
         col.label(text="RigUI Options:")
         col.prop(self, "BLM_AddRUIMode", expand=True)
+
+        row = layout.row()
+        col = layout.column()
+        kc = bpy.context.window_manager.keyconfigs.user
+
+        for km, kmi in addon_keymaps:
+            km = km.active()
+            layout.context_pointer_set("keymap", km)
+            rna_keymap_ui.draw_kmi([], kc, km, kmi, layout, 0)
 
     BLM_AddRUIMode: EnumProperty(
         items=[
@@ -176,6 +191,33 @@ class BLMpreferences(bpy.types.AddonPreferences):
         default=.6,
         subtype="FACTOR")
 
+
+def register_keymap():
+    kcfg = bpy.context.window_manager.keyconfigs.addon
+    if kcfg:
+        km = kcfg.keymaps.new(name='Pose', space_type='VIEW_3D')
+
+        kmi = km.keymap_items.new("qconstraint.constraint_clear", 'X', 'PRESS', alt=True)
+
+        kmi_mnu = km.keymap_items.new("wm.call_menu", "C", "PRESS", alt=True)
+        kmi_mnu.properties.name = QC_MT_popup.bl_idname
+        kmi_mnu.active = True
+
+        addon_keymaps.append((km, kmi))
+        addon_keymaps.append((km, kmi_mnu))
+
+
+def unregister_keymap():
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    km = kc.keymaps['Pose']
+
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+        wm.keyconfigs.addon.keymaps.remove(km)
+    addon_keymaps.clear()
+
+
 classes = (
     BLMpreferences,
     CREATEID_OT_name,
@@ -209,6 +251,20 @@ classes = (
     QC_OT_copyconstraint,
     QC_OT_copyall,
     QC_OT_copyflipx,
+    QC_OT_constraint_clear,
+
 )
 
-register, unregister = bpy.utils.register_classes_factory(classes)
+
+def register():
+    register_keymap()
+    from bpy.utils import register_class
+    for cls in classes:
+        register_class(cls)
+
+
+def unregister():
+    unregister_keymap()
+    from bpy.utils import unregister_class
+    for cls in reversed(classes):
+        unregister_class(cls)
