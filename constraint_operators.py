@@ -61,7 +61,11 @@ def xflip(xname):
 
     mir_name = f'{full_mir_prefix}{base}{full_mir_suffix}{number}'
     # if bone not found return original target
-    return mir_name if arm.pose.bones.get(mir_name) is not None else xname
+    if arm.pose.bones.get(mir_name) is None:
+        ShowMessageBox("Mirror target not found!", "Bone Layer Manager", 'ERROR')
+        return xname
+
+    return mir_name
 
 
 class QC_OT_contraint_action(bpy.types.Operator):
