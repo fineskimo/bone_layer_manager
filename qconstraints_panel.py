@@ -84,7 +84,7 @@ class QC_MT_popup(bpy.types.Menu):
         col = split.column(align=True)
         col.label(text="Tracking")
         col.operator(**args, text="Clamp To", icon='CON_CLAMPTO').ctype = 'CLAMP_TO'
-        col.operator(**args, text="Damped Track", icon='CON_TRACKTO').ctype = 'TRACK_TO'
+        col.operator(**args, text="Damped Track", icon='CON_TRACKTO').ctype = 'DAMPED_TRACK'
         col.operator(**args, text="Inverse Kinemarics", icon='CON_KINEMATIC').ctype = 'IK'
         col.operator(**args, text="Locked Track", icon='CON_LOCKTRACK').ctype = 'LOCKED_TRACK'
         col.operator(**args, text="Spline IK", icon='CON_SPLINEIK').ctype = 'SPLINE_IK'
