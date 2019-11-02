@@ -46,14 +46,12 @@ class BLM_PT_panel_options(bpy.types.Panel):
         row.prop(prefs(), "BLM_ShowLayerSort", text="Enable Sorting")
 
 
-class BLM_PT_panel_layers(bpy.types.Panel):  # renamed as now is subpanel of BLM_PT_panel
-    # Creates a subpanel in the scene context of the properties editor
-    bl_idname = "BLM_PT_panel_layers"
-    bl_label = ""
+class BLM_PT_panel_debug(bpy.types.Panel):
+    bl_idname = "BLM_PT_panel_debug"
+    bl_label = "Debug Tools"
     bl_parent_id = "BLM_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_options = {"HIDE_HEADER"}
 
     def draw(self, context):
         layout = self.layout
@@ -74,6 +72,19 @@ class BLM_PT_panel_layers(bpy.types.Panel):  # renamed as now is subpanel of BLM
 
         row.operator("bone_layer_man.deformerisolate",
                      emboss=True, text="Deform Bones Only")
+
+
+class BLM_PT_panel_layers(bpy.types.Panel):  # renamed as now is subpanel of BLM_PT_panel
+    # Creates a subpanel in the scene context of the properties editor
+    bl_idname = "BLM_PT_panel_layers"
+    bl_label = ""
+    bl_parent_id = "BLM_PT_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_options = {"HIDE_HEADER"}
+
+    def draw(self, context):
+        layout = self.layout
 
         row = layout.row()
         row.label(text="Bone Layers", translate=False)

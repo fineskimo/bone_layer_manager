@@ -2,7 +2,7 @@ from . customprop_panel import (BLM_PT_customproperties, BLM_PT_customproperties
                                 BLM_PT_customproperties_layout)
 
 from . rigui_panel import BLM_PT_rigui
-from . bone_layers_panel import (BLM_PT_panel, BLM_PT_panel_options, BLM_PT_panel_layers)
+from . bone_layers_panel import (BLM_PT_panel, BLM_PT_panel_options, BLM_PT_panel_layers, BLM_PT_panel_debug)
 from . write_ui_script import WRITEUI_OT_writeui
 from . swap_layers import BLSWAP_OT_swaplayers
 from . toggle_deform_prop import BLDEF_OT_deformproptoggle
@@ -33,7 +33,7 @@ bl_info = {
     'name': 'Bone Layer Manager',
     'description': 'Add Bone Layer Name functionality and Rig UI Creation Tools',
     'author': 'Alfonso Annarumma, Paolo Acampora, Fin, COnLOAR',
-    'version': (0, 7, 8),
+    'version': (0, 7, 9),
     'blender': (2, 80, 0),
     'location': 'View3D > Properties  > Bone Layers',
     'warning': '',
@@ -193,6 +193,7 @@ classes = (
     WRITEUI_OT_writeui,
     BLM_PT_panel,
     BLM_PT_panel_options,
+    BLM_PT_panel_debug,
     BLM_PT_panel_layers,
     BLM_PT_rigui,
     BLM_PT_customproperties,
