@@ -182,8 +182,13 @@ class QC_UL_conlist(bpy.types.UIList):
             icon = 'BLANK1' if constraint_alert(item) else 'ERROR'
             row.label(text="", icon=icon)
             row = layout.row(align=True)
-            icon = 'HIDE_ON' if item.mute else 'HIDE_OFF'
-            row.prop(item, "mute", text="", icon=icon, emboss=False)
+            # Blender 2.81 api change (causing wrong icon to be shown)
+            if bpy.app.version >= (2, 81, 0):
+                row.prop(item, "mute", text="", icon='HIDE_OFF', emboss=False)
+
+            else:
+                icon = 'HIDE_OFF' if not item.mute else 'HIDE_ON'
+                row.prop(item, "mute", text="", icon=icon, emboss=False)
 
 
 class QC_PT_ConSettings(bpy.types.Panel):
