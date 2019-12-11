@@ -70,14 +70,14 @@ class WRITEUI_OT_writeui(bpy.types.Operator):
         ##############################
 
         # Iterate through layers writing rows for the Rig UI
-        for x in range(1, 33):
+        for x in range(0, 32):
             blockstart = True
 
-            for i in range(33):
+            for i in range(32):
                 name_id_prop = f"layer_name_{i}"
                 rigui_id_prop = f"rigui_id_{i}"
                 name = ac_ob.data.get(name_id_prop, "*NO NAME*")
-                uselayer = ac_ob.data.get(rigui_id_prop, 0)
+                uselayer = ac_ob.data.get(rigui_id_prop, -1)
 
                 # Set start of UI row
                 if uselayer == x and endblock is False:
