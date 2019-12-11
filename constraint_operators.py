@@ -180,8 +180,8 @@ class QC_OT_constraint_add(bpy.types.Operator):
             bpy.ops.pose.constraint_add(type=self.ctype)
         # Redraw required to update QC_UL_conlist
         for region in context.area.regions:
-                if region.type == "UI":
-                    region.tag_redraw()
+            if region.type == "UI":
+                region.tag_redraw()
         # Add index if not present
         if bone.get('constraint_active_index') is None:
             bone.constraint_active_index = 0
@@ -205,8 +205,8 @@ class QC_OT_constraint_clear(bpy.types.Operator):
         bpy.ops.pose.constraints_clear('INVOKE_DEFAULT')
         # Redraw required to update QC_UL_conlist
         for region in context.area.regions:
-                if region.type == "UI":
-                    region.tag_redraw()
+            if region.type == "UI":
+                region.tag_redraw()
 
         # remove index property from all bones
         for bone in context.selected_pose_bones:
