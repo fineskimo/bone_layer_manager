@@ -142,7 +142,7 @@ class WRITEUI_OT_writeui(bpy.types.Operator):
             '\t''\t'"for bone in context.selected_pose_bones:"'\n'
             '\t''\t''\t'"if len(bone.keys()) > 0:"'\n'
             '\t''\t''\t''\t'"box = layout.box()"'\n'
-            '\t''\t''\t'"for key in sorted(bone.keys():"'\n'
+            '\t''\t''\t'"for key in sorted(bone.keys()):"'\n'
             '\t''\t''\t''\t'"if key not in '_RNA_UI':"'\n'
             '\t''\t''\t''\t''\t'"val = bone.get(key, \"value\")"'\n'
             '\t''\t''\t''\t''\t'"row = box.row()"'\n'
