@@ -144,7 +144,7 @@ class WRITEUI_OT_writeui(bpy.types.Operator):
             '\t'"# Iterate through selected bones add each prop property of each bone to the panel."'\n'
             '\n'
             '\t''\t'"for bone in context.selected_pose_bones:"'\n'
-            '\t''\t''\t'"if len(bone.keys()) > 0:"'\n'
+            '\t''\t''\t'"if len(bone.keys()) > 1:"'\n'
             '\t''\t''\t''\t'"box = layout.box()"'\n'
             '\t''\t''\t'"for key in sorted(bone.keys()):"'\n'
             '\t''\t''\t''\t'"if key != '_RNA_UI' and key not in rna_properties:"'\n'
