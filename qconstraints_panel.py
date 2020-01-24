@@ -411,17 +411,20 @@ class QC_PT_ConSettings(bpy.types.Panel):
                                 if con.pole_target and con.pole_target.type == 'ARMATURE':
                                     layout.prop_search(con, "pole_subtarget", con.pole_target.data, "bones", text="Bone")
 
-                                if con.pole_target:
-                                    row = layout.row()
-                                    row.prop(con, "pole_angle")
-                                    row.label()
-
                                 split = layout.split()
                                 col = split.column()
+
+                                if con.pole_target:
+                                    col.prop(con, "pole_angle")
+
                                 col.prop(con, "iterations")
                                 col.prop(con, "chain_count")
 
                                 col = split.column()
+
+                                if con.pole_target:
+                                    col.operator("qconstraint.autopole", text="Auto Pole")
+
                                 col.prop(con, "use_tail")
                                 col.prop(con, "use_stretch")
 

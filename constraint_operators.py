@@ -2,6 +2,8 @@ import bpy
 import re
 
 from .blmfuncs import ShowMessageBox
+from math import degrees
+from mathutils import *
 
 bpy.types.PoseBone.constraint_active_index = bpy.props.IntProperty()
 
@@ -10,6 +12,62 @@ readonly_attr = ['__doc__', '__module__', '__slots__', 'bl_rna', 'error_location
 
 l_names = ['Left', 'left', 'LEFT', 'L', 'l']
 r_names = ['Right', 'right', 'RIGHT', 'R', 'r']
+
+
+def getPolePos(ikbone, parent):  # Stackexchange : Marco Giordano
+
+    bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
+    # Get points to define the plane on which to put the pole target
+    # arm = bpy.data.objects[arm_name]
+    arm = bpy.context.active_object.data
+    ebones = arm.edit_bones
+    A = ebones[parent].head
+    B = ebones[ikbone].head
+    C = ebones[ikbone].tail
+
+    # Vector of chain root (parent.head) to chain tip (ikbone.tail)
+    AC = C - A
+
+    # Vector of chain root (parent.head) to constrained bone head (ikbone.head)
+    AB = B - A
+
+    # Multiply the two vectors to get the dot product
+    dot_prod = AB @ AC
+
+    # Find the point on the vector AC projected from point B
+    proj = dot_prod / AC.length
+
+    # Normalize AC vector
+    start_end_norm = AC.normalized()
+
+    # Project an arrow from AC projection point to point B (pole vector)
+    proj_vec = start_end_norm * proj
+    pole_vec = AB - proj_vec
+
+    # Set pole location based chain bones length(average)
+    distance = (ebones[parent].length + ebones[ikbone].length) / 2
+    final_pole_vec = pole_vec + Vector((distance, distance, distance))
+
+    return final_pole_vec
+
+
+def signed_angle(vector_u, vector_v, normal):  # Stackexchange Jerryno
+    # Normal specifies orientation
+    angle = vector_u.angle(vector_v)
+    if vector_u.cross(vector_v).angle(normal) < 1:
+        angle = -angle
+
+    return angle
+
+
+def get_pole_angle(parent, ikbone, pole_location):  # Stackexchange : Jerryno
+    # Calculates pole angle for 2 bone IK chains
+    pole_normal = (ikbone.tail - parent.head).cross(pole_location - parent.head)
+    projected_pole_axis = pole_normal.cross(parent.tail - parent.head)
+    pole_angle = signed_angle(parent.x_axis, projected_pole_axis, parent.tail - parent.head)
+
+    return pole_angle
 
 
 def getmirror(side, oside, name):
@@ -363,5 +421,56 @@ class QC_OT_copyall(bpy.types.Operator):
                 target_bone.constraint_active_index = 0
 
         bpy.ops.pose.constraints_copy('INVOKE_DEFAULT')
+
+        return {'FINISHED'}
+
+
+class QC_OT_autopole(bpy.types.Operator):
+    # set pole target locatation and pole angle in contraint
+    bl_idname = "qconstraint.autopole"
+    bl_label = ""
+    bl_description = "Automatic pole target location and pole angle"
+
+    @classmethod
+    def poll(self, context):
+        # only supports chains of length 2
+        cbone = context.active_pose_bone
+        idx = cbone.constraint_active_index
+        const = cbone.constraints[idx]
+
+        return const.chain_count == 2
+
+    def execute(self, context):
+        arm = bpy.context.active_object
+        cbone = context.active_pose_bone
+        ikbone = cbone.name
+        parent = cbone.parent.name
+        idx = cbone.constraint_active_index
+        con = cbone.constraints[idx]
+        pole_target = con.pole_subtarget
+
+        # clear transforms and IK influence during calcultions
+        bpy.ops.object.mode_set(mode='POSE', toggle=False)
+        for pbones in arm.pose.bones:
+            pbones.matrix_basis = Matrix()
+
+        con.influence = 0
+
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        ebones = arm.data.edit_bones
+        pole_position = getPolePos(ikbone, parent)
+        length = ebones[pole_target].length
+        ebones[pole_target].head = pole_position
+        ebones[pole_target].tail = pole_position + Vector((0.0, length, 0.0))
+
+        bpy.ops.object.mode_set(mode='POSE', toggle=False)
+
+        parent = arm.pose.bones[parent]
+        ikbone = arm.pose.bones[ikbone]
+        pole_target = arm.pose.bones[pole_target]
+
+        pole_location = pole_target.matrix.translation
+        con.pole_angle = get_pole_angle(parent, ikbone, pole_location)
+        con.influence = 1
 
         return {'FINISHED'}
