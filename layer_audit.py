@@ -31,7 +31,7 @@ class BLM_OT_layeraudit(bpy.types.Operator):
             arm = ac_ob.data
 
             for i in range(len(arm.layers)):
-                    # layer id property
+                # layer id property
                 name_id_prop = f"layer_name_{i}"
                 rigui_id_prop = f"rigui_id_{i}"
                 reset_rigui = arm.get(rigui_id_prop, None)

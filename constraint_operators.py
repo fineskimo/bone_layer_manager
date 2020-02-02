@@ -436,9 +436,10 @@ class QC_OT_autopole(bpy.types.Operator):
         # only supports chains of length 2
         cbone = context.active_pose_bone
         idx = cbone.constraint_active_index
-        const = cbone.constraints[idx]
+        con = cbone.constraints[idx]
+        pole_target = con.pole_subtarget
 
-        return const.chain_count == 2
+        return pole_target != "" and con.chain_count == 2
 
     def execute(self, context):
         arm = bpy.context.active_object
