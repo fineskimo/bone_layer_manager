@@ -60,17 +60,18 @@ class BLM_PT_rigui(bpy.types.Panel):
             if (len(objects) > 1):
                 row.label(text=ac_ob.name, icon='ARMATURE_DATA')
 
-            # Export button
-            row = split.row(align=True)
-            row.label(text="Write UI to script", translate=False)
-            row.operator("bone_layer_man.write_rig_ui", emboss=True, text="", icon='TEXT')
-
             # Display layer buttons
             for i in sorted(rows):
                 row = box.row(align=True)
 
                 for (name, x) in rows[i]:
                     row.prop(arm, 'layers', index=x, toggle=True, text=name)
+
+            # Export button
+            row = split.row(align=True)
+            row.alignment = 'RIGHT'
+            row.label(text="Export UI", translate=False)
+            row.operator("bone_layer_man.write_rig_ui", emboss=True, text="", icon='EXPORT')
 
         if empty_ui:
             layout.label(text="No available UI layers in rigs", icon='INFO')
