@@ -29,12 +29,12 @@ class WRITEUI_OT_writeui(bpy.types.Operator, ExportHelper):
                                  default="Rig UI")
 
     rig_cp_pname: StringProperty(name="Rig Properties Panel",
-                                 description="Rig Properties panel header namer",
+                                 description="Rig Properties panel header name",
                                  default="Rig Properties")
 
     use_item_panel: BoolProperty(
         name="Add to 'Item' tab",
-        description="Add to 'Item' tab or created dedicated 'Rig UI' tab",
+        description="Add to 'Item' tab or create dedicated 'Rig UI' tab",
         default=True,
         )
 
