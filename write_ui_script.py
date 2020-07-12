@@ -16,7 +16,7 @@ class WRITEUI_OT_writeui(bpy.types.Operator, ExportHelper):
     filename_ext = ".py"
 
     filter_glob = StringProperty(
-        default="*.obj",
+        default="*.py",
         options={'HIDDEN'},
         )
 
@@ -55,8 +55,12 @@ class WRITEUI_OT_writeui(bpy.types.Operator, ExportHelper):
         row.label(text="Rig Properties panel name")
         row.prop(self, "rig_cp_pname", text='')
 
+    def invoke(self, context, event):
+        self.filepath = os.path.splitext(bpy.data.filepath)[0] + "_rigui.py"
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
     def execute(self, context):
-        default_path = os.path.splitext(bpy.data.filepath)[0] + ".py"
         file_write = open(self.filepath, 'w').write
         ac_ob = context.active_object
         scn = context.scene
@@ -77,14 +81,8 @@ class WRITEUI_OT_writeui(bpy.types.Operator, ExportHelper):
         new_rig_id = ''.join([random.choice(string.ascii_lowercase + string.digits) for _ in range(12)])
 
         # Check for Rig ID and assign if not present
-        try:
-            set_rig_id = ac_ob.data['blm_rig_id']
-        except:
-            ac_ob.data['blm_rig_id'] = new_rig_id
-
-        set_rig_id = ac_ob.data['blm_rig_id']
-
-        # text = bpy.data.texts.new('Rig_UI.py')
+        set_rig_id = ac_ob.data.get('blm_rig_id', new_rig_id)
+        ac_ob.data['blm_rig_id'] = set_rig_id
 
         ##############################
 
