@@ -15,7 +15,7 @@ class WRITEUI_OT_writeui(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".py"
 
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.py",
         options={'HIDDEN'},
         )

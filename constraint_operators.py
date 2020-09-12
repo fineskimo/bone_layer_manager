@@ -274,6 +274,20 @@ class QC_OT_constraint_clear(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class QC_OT_add_target(bpy.types.Operator):
+    """Add a target to the constraint"""
+    bl_idname = "qconstraint.add_target"
+    bl_label = "Add Target"
+    bl_options = {'UNDO', 'INTERNAL'}
+
+    def execute(self, context):
+        bone = context.active_pose_bone
+        idx = bone.constraint_active_index
+        constraint = bone.constraints[idx]
+        constraint.targets.new()
+        return {'FINISHED'}
+
+
 class QC_OT_remove_target(bpy.types.Operator):
     # Remove the target from the constraint
     bl_idname = "qconstraint.remove_target"
@@ -289,6 +303,26 @@ class QC_OT_remove_target(bpy.types.Operator):
         constraint = bone.constraints[idx]
         tgts = constraint.targets
         tgts.remove(tgts[self.index])
+        return {'FINISHED'}
+
+
+class QC_OT_normalize_target_weights(bpy.types.Operator):
+    """Normalize weights of all target bones"""
+    bl_idname = "qconstraint.normalize_target_weights"
+    bl_label = "Normalize Weights"
+    bl_options = {'UNDO', 'INTERNAL'}
+
+    def execute(self, context):
+        bone = context.active_pose_bone
+        idx = bone.constraint_active_index
+        constraint = bone.constraints[idx]
+        tgts = constraint.targets
+        total = sum(t.weight for t in tgts)
+
+        if total > 0:
+            for t in tgts:
+                t.weight = t.weight / total
+
         return {'FINISHED'}
 
 
