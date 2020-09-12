@@ -1337,9 +1337,9 @@ class QC_PT_bActionConstraint_target(bpy.types.Panel):
         col.prop(con, "max", text="Max")
 
 
-class BONE_PT_bActionConstraint_action(bpy.types.Panel):
+class QC_PT_bActionConstraint_action(bpy.types.Panel):
     bl_label = "Action"
-    bl_idname = "QC_PT_bActionConstraint_target"
+    bl_idname = "QC_PT_bActionConstraint_action"
     bl_category = "Bone Layers"
     bl_parent_id = "QC_PT_qcontraints"
     bl_space_type = 'VIEW_3D'

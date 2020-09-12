@@ -17,7 +17,9 @@ from . layer_audit import BLM_OT_layeraudit
 from . qconstraints_panel import (QC_MT_specials, QC_MT_popup, QC_UL_conlist,
                                   QC_PT_qcontraints, QC_PT_subqcontraints,
                                   QC_PT_ConSettings,
-                                  QC_PT_bArmatureConstraint_bones,)
+                                  QC_PT_bArmatureConstraint_bones, QC_PT_bSplineIKConstraint_fitting, QC_PT_bSplineIKConstraint_chain_scaling,
+                                  QC_PT_bTransformConstraint_from, QC_PT_bTransformConstraint_to, QC_PT_bActionConstraint_target, QC_PT_bActionConstraint_action,
+                                  )
 
 from . constraint_operators import (QC_OT_contraint_action, QC_OT_constraint_add,
                                     QC_OT_add_target, QC_OT_remove_target, QC_OT_disable_keep_transform, QC_OT_normalize_target_weights,
@@ -219,6 +221,12 @@ classes = (
     QC_OT_constraint_clear,
     QC_OT_autopole,
     QC_PT_bArmatureConstraint_bones,
+    QC_PT_bSplineIKConstraint_fitting,
+    QC_PT_bSplineIKConstraint_chain_scaling,
+    QC_PT_bTransformConstraint_from,
+    QC_PT_bTransformConstraint_to,
+    QC_PT_bActionConstraint_target,
+    QC_PT_bActionConstraint_action,
 
 )
 
