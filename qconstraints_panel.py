@@ -53,20 +53,20 @@ class QC_MT_popup(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
-        row.alignment = 'LEFT'
+        row.alignment = 'RIGHT'
         split = row.split(align=True, factor=0.25)
 
         args = dict(operator='qconstraint.constraint_add', emboss=False)
 
         # MotionTracking
-        col = split.column(align=True)
+        col = split.column()
         col.label(text="Motion Tracking")
         col.operator(**args, text="Camera Solver", icon='CON_CAMERASOLVER').ctype = 'CAMERA_SOLVER'
         col.operator(**args, text="Follow Track", icon='CON_FOLLOWTRACK').ctype = 'FOLLOW_TRACK'
         col.operator(**args, text="Object Solver", icon='CON_OBJECTSOLVER').ctype = 'OBJECT_SOLVER'
 
         # Transform
-        col = split.column(align=True)
+        col = split.column()
         col.label(text="Transform")
         col.operator(**args, text="Copy Location", icon='CON_LOCLIKE').ctype = 'COPY_LOCATION'
         col.operator(**args, text="Copy Rotation", icon='CON_ROTLIKE').ctype = 'COPY_ROTATION'
@@ -81,7 +81,7 @@ class QC_MT_popup(bpy.types.Menu):
         col.operator(**args, text="Transform Cache", icon='CON_TRANSFORM_CACHE').ctype = 'TRANSFORM_CACHE'
 
         # Tracking
-        col = split.column(align=True)
+        col = split.column()
         col.label(text="Tracking")
         col.operator(**args, text="Clamp To", icon='CON_CLAMPTO').ctype = 'CLAMP_TO'
         col.operator(**args, text="Damped Track", icon='CON_TRACKTO').ctype = 'DAMPED_TRACK'
@@ -92,7 +92,7 @@ class QC_MT_popup(bpy.types.Menu):
         col.operator(**args, text="Track To", icon='CON_TRACKTO').ctype = 'TRACK_TO'
 
         # Relationship
-        col = split.column(align=True)
+        col = split.column()
         col.label(text="Relationship")
         col.operator(**args, text="Action", icon='ACTION').ctype = 'ACTION'
         col.operator(**args, text="Armature", icon='CON_ARMATURE').ctype = 'ARMATURE'
@@ -230,7 +230,8 @@ class QC_PT_ConSettings(bpy.types.Panel):
                     sub.prop(con, "head_tail")
                     # XXX icon, and only when bone has segments?
                     sub.prop(con, "use_bbone_shape", text="", icon='IPO_BEZIER')
-                    row.prop_decorator(con, "head_tail")
+                    if bpy.app.version >= (2, 90, 0):
+                        row.prop_decorator(con, "head_tail")
             elif con.target.type in {'MESH', 'LATTICE'}:
                 col.prop_search(con, "subtarget", con.target, "vertex_groups", text="Vertex Group")
 
@@ -340,8 +341,8 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         layout.prop(con, "camera")
 
                         row = layout.row()
-                        row.operator("constraint.objectsolver_set_inverse")
-                        row.operator("constraint.objectsolver_clear_inverse")
+                        row.operator("bone.constraint_action", text="Set Inverse").action = 'OB_SET_INVERSE'
+                        row.operator("bone.constraint_action", text="Clear Inverse").action = 'OB_CLEAR_INVERSE'
 
                         layout.operator("clip.constraint_to_fcurve")
 
@@ -353,7 +354,11 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         self.target_template(layout, con)
 
-                        row = layout.row(heading="Axis", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Axis", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Axis")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_x", text="X", toggle=True)
@@ -361,7 +366,11 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         sub.prop(con, "use_z", text="Z", toggle=True)
                         row.label(icon='BLANK1')
 
-                        row = layout.row(heading="Invert", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Invert", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Invert")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "invert_x", text="X", toggle=True)
@@ -383,7 +392,11 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         layout.prop(con, "euler_order", text="Order")
 
-                        row = layout.row(heading="Axis", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Axis", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Axis")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_x", text="X", toggle=True)
@@ -391,7 +404,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         sub.prop(con, "use_z", text="Z", toggle=True)
                         row.label(icon='BLANK1')
 
-                        row = layout.row(heading="Invert", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Invert", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Invert")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "invert_x", text="X", toggle=True)
@@ -411,7 +429,11 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         self.target_template(layout, con)
 
-                        row = layout.row(heading="Axis", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Axis", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Axis")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_x", text="X", toggle=True)
@@ -452,7 +474,7 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         row = layout.row()
                         row.prop(con, "distance")
-                        row.operator("constraint.limitdistance_reset", text="", icon="X")
+                        row.operator("bone.constraint_action", text="", icon="X").action = 'LD_RESET'
 
                         layout.prop(con, "limit_mode", text="Clamp Region")
 
@@ -468,61 +490,93 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         col = layout.column()
 
-                        row = col.row(heading="Minimum X", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Minimum X", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum X")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_x", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_x
                         subsub.prop(con, "min_x", text="")
-                        row.prop_decorator(con, "min_x")
 
-                        row = col.row(heading="Y", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_x")
+
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Y", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum Y")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_y", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_y
                         subsub.prop(con, "min_y", text="")
-                        row.prop_decorator(con, "min_y")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_y")
 
-                        row = col.row(heading="Z", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Z", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum Z")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_z", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_z
                         subsub.prop(con, "min_z", text="")
-                        row.prop_decorator(con, "min_z")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_z")
 
                         col.separator()
 
-                        row = col.row(heading="Maximum X", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Maximum X", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Maximum X")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_x", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_x
                         subsub.prop(con, "max_x", text="")
-                        row.prop_decorator(con, "max_x")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_x")
 
-                        row = col.row(heading="Y", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Y", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Maximum Y")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_y", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_y
                         subsub.prop(con, "max_y", text="")
-                        row.prop_decorator(con, "max_y")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_y")
 
-                        row = col.row(heading="Z", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Z", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Maximum Z")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_z", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_z
                         subsub.prop(con, "max_z", text="")
-                        row.prop_decorator(con, "max_z")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_z")
 
                         layout.prop(con, "use_transform_limit")
                         layout.prop(con, "owner_space")
@@ -534,7 +588,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         layout.use_property_decorate = True
 
                         # Decorators and property split are really buggy with these properties
-                        row = layout.row(heading="Limit X", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Limit X", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Limit X")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_limit_x", text="")
                         sub = row.column(align=True)
@@ -543,7 +602,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         sub.prop(con, "max_x", text="Max")
                         row.label(icon="BLANK1")
 
-                        row = layout.row(heading="Y", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Y", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Limit Y")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_limit_y", text="")
                         sub = row.column(align=True)
@@ -552,7 +616,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         sub.prop(con, "max_y", text="Max")
                         row.label(icon="BLANK1")
 
-                        row = layout.row(heading="Z", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Z", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Limit Z")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_limit_z", text="")
                         sub = row.column(align=True)
@@ -572,61 +641,97 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         col = layout.column()
 
-                        row = col.row(heading="Minimum X", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Minimum X", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum X")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_x", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_x
                         subsub.prop(con, "min_x", text="")
-                        row.prop_decorator(con, "min_x")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_x")
 
-                        row = col.row(heading="Y", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Y", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum Y")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_y", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_y
                         subsub.prop(con, "min_y", text="")
-                        row.prop_decorator(con, "min_y")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_y")
 
-                        row = col.row(heading="Z", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Z", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Minimum Z")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_min_z", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_min_z
                         subsub.prop(con, "min_z", text="")
-                        row.prop_decorator(con, "min_z")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "min_z")
 
                         col.separator()
 
-                        row = col.row(heading="Maximum X", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Maximum X", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Maximum X")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_x", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_x
                         subsub.prop(con, "max_x", text="")
-                        row.prop_decorator(con, "max_x")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_x")
 
-                        row = col.row(heading="Y", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Y", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Maximum Y")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_y", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_y
                         subsub.prop(con, "max_y", text="")
-                        row.prop_decorator(con, "max_y")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_y")
 
-                        row = col.row(heading="Z", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Z", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Maximum Z")
+
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_max_z", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_max_z
                         subsub.prop(con, "max_z", text="")
-                        row.prop_decorator(con, "max_z")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "max_z")
 
                         layout.prop(con, "use_transform_limit")
                         layout.prop(con, "owner_space")
@@ -639,7 +744,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         layout.prop(con, "mode")
 
-                        row = layout.row(heading="Free Axis")
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Free Axis", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            # row.label(text="Free Axis")
+
                         row.prop(con, "free_axis", expand=True)
 
                         layout.prop(con, "volume")
@@ -729,7 +839,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                                 row.active = con.use_location
                                 row.prop(con, "weight", text="Weight", slider=True)
 
-                                row = loc_col.row(heading="Lock", align=True)
+                                if bpy.app.version >= (2, 90, 0):
+                                    row = loc_col.row(heading="Lock", align=True)
+                                else:
+                                    row = loc_col.row(align=True)
+                                    row.label(text="Lock")
+
                                 row.use_property_decorate = False
                                 row.active = con.use_location
                                 sub = row.row(align=True)
@@ -745,7 +860,12 @@ class QC_PT_ConSettings(bpy.types.Panel):
                                 row.active = con.use_rotation
                                 row.prop(con, "orient_weight", text="Weight", slider=True)
 
-                                row = rot_col.row(heading="Lock", align=True)
+                                if bpy.app.version >= (2, 90, 0):
+                                    row = rot_col.row(heading="Lock", align=True)
+                                else:
+                                    row = rot_col.row(align=True)
+                                    row.label(text="Lock")
+
                                 row.use_property_decorate = False
                                 row.active = con.use_rotation
                                 sub = row.row(align=True)
@@ -777,13 +897,22 @@ class QC_PT_ConSettings(bpy.types.Panel):
                             col.prop(con, "use_stretch")
 
                             col = layout.column()
-                            row = col.row(align=True, heading="Weight Position")
+                            if bpy.app.version >= (2, 90, 0):
+                                row = col.row(heading="Weight Position", align=True)
+                            else:
+                                row = col.row(align=True)
+                                row.label(text="Weight Position")
+
                             row.prop(con, "use_location", text="")
                             sub = row.row(align=True)
                             sub.active = con.use_location
                             sub.prop(con, "weight", text="", slider=True)
 
-                            row = col.row(align=True, heading="Rotation")
+                            if bpy.app.version >= (2, 90, 0):
+                                row = col.row(heading="Rotation", align=True)
+                            else:
+                                row = col.row(align=True)
+                                row.label(text="Rotation")
                             row.prop(con, "use_rotation", text="")
                             sub = row.row(align=True)
                             sub.active = con.use_rotation
@@ -837,23 +966,33 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         col = layout.column()
                         col.prop(con, "bulge", text="Volume Variation")
 
-                        row = col.row(heading="Volume Min", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Volume Min", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Volume Min")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_bulge_min", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_bulge_min
                         subsub.prop(con, "bulge_min", text="")
-                        row.prop_decorator(con, "bulge_min")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "bulge_min")
 
-                        row = col.row(heading="Max", align=True)
+                        if bpy.app.version >= (2, 90, 0):
+                            row = col.row(heading="Max", align=True)
+                        else:
+                            row = col.row(align=True)
+                            row.label(text="Max")
                         row.use_property_decorate = False
                         sub = row.row(align=True)
                         sub.prop(con, "use_bulge_max", text="")
                         subsub = sub.row(align=True)
                         subsub.active = con.use_bulge_max
                         subsub.prop(con, "bulge_max", text="")
-                        row.prop_decorator(con, "bulge_max")
+                        if bpy.app.version >= (2, 90, 0):
+                            row.prop_decorator(con, "bulge_max")
 
                         row = col.row()
                         row.active = con.use_bulge_min or con.use_bulge_max
@@ -869,6 +1008,16 @@ class QC_PT_ConSettings(bpy.types.Panel):
                         layout.use_property_decorate = True
 
                         self.target_template(layout, con)
+
+                        if bpy.app.version >= (2, 91, 0):
+                            row = layout.row(align=True, heading="Evaluation Time")
+                            row.use_property_decorate = False
+                            sub = row.row(align=True)
+                            sub.prop(con, "use_eval_time", text="")
+                            subsub = sub.row(align=True)
+                            subsub.active = con.use_eval_time
+                            subsub.prop(con, "eval_time", text="")
+                            row.prop_decorator(con, "eval_time")
 
                         layout.prop(con, "mix_mode", text="Mix")
 
@@ -901,21 +1050,36 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         self.target_template(layout, con)
 
-                        row = layout.row(heading="Location")
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Location", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Location")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_location_x", text="X", toggle=True)
                         row.prop(con, "use_location_y", text="Y", toggle=True)
                         row.prop(con, "use_location_z", text="Z", toggle=True)
                         row.label(icon='BLANK1')
 
-                        row = layout.row(heading="Rotation")
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Rotation", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Rotation")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_rotation_x", text="X", toggle=True)
                         row.prop(con, "use_rotation_y", text="Y", toggle=True)
                         row.prop(con, "use_rotation_z", text="Z", toggle=True)
                         row.label(icon='BLANK1')
 
-                        row = layout.row(heading="Scale")
+                        if bpy.app.version >= (2, 90, 0):
+                            row = layout.row(heading="Scale", align=True)
+                        else:
+                            row = layout.row(align=True)
+                            row.label(text="Scale")
+
                         row.use_property_decorate = False
                         row.prop(con, "use_scale_x", text="X", toggle=True)
                         row.prop(con, "use_scale_y", text="Y", toggle=True)
@@ -1019,14 +1183,21 @@ class QC_PT_ConSettings(bpy.types.Panel):
 
                         if con.shrinkwrap_type in {'PROJECT', 'NEAREST_SURFACE', 'TARGET_PROJECT'}:
                             layout.prop(con, "wrap_mode", text="Snap Mode")
-                            row = layout.row(heading="Align to Normal", align=True)
+
+                            if bpy.app.version >= (2, 90, 0):
+                                row = layout.row(heading="Align to Normal", align=True)
+                            else:
+                                row = layout.row(align=True)
+                                row.label(text="Align to Normal")
+
                             row.use_property_decorate = False
                             sub = row.row(align=True)
                             sub.prop(con, "use_track_normal", text="")
                             subsub = sub.row(align=True)
                             subsub.active = con.use_track_normal
                             subsub.prop(con, "track_axis", text="")
-                            row.prop_decorator(con, "track_axis")
+                            if bpy.app.version >= (2, 90, 0):
+                                row.prop_decorator(con, "track_axis")
 
                         self.draw_influence(layout, con)
 
@@ -1169,13 +1340,23 @@ class QC_PT_bSplineIKConstraint_chain_scaling(bpy.types.Panel):
             col = layout.column()
             col.prop(con, "bulge", text="Volume Variation")
 
-            row = col.row(heading="Volume Min")
+            if bpy.app.version >= (2, 90, 0):
+                row = col.row(heading="Volume Min", align=True)
+            else:
+                row = col.row(align=True)
+                row.label(text="Volume Min")
+
             row.prop(con, "use_bulge_min", text="")
             sub = row.row()
             sub.active = con.use_bulge_min
             sub.prop(con, "bulge_min", text="")
 
-            row = col.row(heading="Max")
+            if bpy.app.version >= (2, 90, 0):
+                row = col.row(heading="Max", align=True)
+            else:
+                row = col.row(align=True)
+                row.label(text="MAx")
+
             row.prop(con, "use_bulge_max", text="")
             sub = row.row()
             sub.active = con.use_bulge_max
@@ -1328,7 +1509,8 @@ class QC_PT_bActionConstraint_target(bpy.types.Panel):
 
         layout.use_property_split = True
         layout.use_property_decorate = True
-
+        if bpy.app.version >= (2, 90, 0):
+            layout.active = not con.use_eval_time
         layout.prop(con, "transform_channel", text="Channel")
         layout.prop(con, "target_space")
 
